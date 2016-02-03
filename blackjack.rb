@@ -3,8 +3,15 @@ def convert_card_value (input)
     return 11
   elsif input == "J" || input =="Q" || input == "K"
     return 10
+  elsif input.to_i.to_s == input
+    num = input.to_i
+    if (1..10).to_a.include?(num)
+      return num
+    else
+      return 0 #invalid input
+    end
   else
-    return input.to_i
+      return 0  #invalid input
   end
 end
 
@@ -128,7 +135,9 @@ puts "Enter the dealer top hand: "
 dealer_top = gets.chomp
 
 if first_card == "" || second_card == ""|| dealer_top == ""
-  puts "You didn't follow instructions. Bye."
+  puts "Oops! You skipped some cards. Bye."
+elsif convert_card_value(first_card) == 0 || convert_card_value(second_card) == 0|| convert_card_value(dealer_top) == 0
+  puts "Not sure what kind of deck you have, but we don't have it"
 else
   correct_options = {}
   choices_for_total = {}

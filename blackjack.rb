@@ -6,23 +6,18 @@ def convert_card_value (input)
   else
     return input.to_i
   end
-  puts "leaving convert_card_value"
 end
 
-def build_hard_options_hash
+def build_hard_options
   hit_opt = "Hit"
-  dh_opt = "Double Hit, if possible"
+  dh_opt = "Double Hit, if possible; otherwise Hit"
   std_opt = "Stand"
 
   hard_hash = {}
 
   (5..16).each do |hand_tot|
-    puts hand_tot
     hard_hash[hand_tot] = Hash.new(hit_opt)
   end
-  puts hard_hash
-  puts
-  puts
 
   (17..21).each do |hand_tot|
     hard_hash[hand_tot] = Hash.new(std_opt)
@@ -47,14 +42,13 @@ def build_hard_options_hash
     end
   end
 
-  puts "hard: \n#{hard_hash}"
   return hard_hash
-
 end
 
-def build_soft_options_hash
+def build_soft_options
   hit_opt = "Hit"
-  dh_opt = "Double Hit, if possible"
+  dh_opt = "Double Hit, if possible; otherwise Hit"
+  ds_opt = "Double Hit, if possible; otherwise Stand"
   std_opt = "Stand"
 
   soft_hash = {}
@@ -68,28 +62,24 @@ def build_soft_options_hash
   end
 
   #now set exceptions
-  (13..18).each do |x|
+  (13..17).each do |x|
     (4..6).each do |y|
       soft_hash[x][y] = dh_opt
     end
   end
 
-  soft_hash[17][2] = dh_opt
-  soft_hash[17][2] = dh_opt
-  soft_hash[18][3] = dh_opt
+  soft_hash[17][2] = soft_hash[17][3] = dh_opt
+  soft_hash[18][3] = ds_opt
+  soft_hash[18][3] = soft_hash[18][4] = soft_hash[18][5] = soft_hash[18][6] = ds_opt
   soft_hash[18][9] = soft_hash[18][10] = hit_opt
-
-  # puts
-  # puts
-  puts "soft: \n#{soft_hash}"
+  soft_hash[19][6] = ds_opt
 
   return soft_hash
-
 end
 
 def build_pair_options
   hit_opt = "Hit"
-  dh_opt = "Double Hit, if possible"
+  dh_opt = "Double Hit, if possible; otherwise Hit"
   std_opt = "Stand"
   spl_opt = "Split"
 
@@ -115,13 +105,21 @@ def build_pair_options
 
   pairs_hash[5][10] = pairs_hash[5][11] = hit_opt
 
+  (8..11).each do |x|
+    pairs_hash[6][x] = hit_opt
+  end
+
+  pairs_hash[7][9] = pairs_hash[7][11] = hit_opt
+  pairs_hash[7][10] = std_opt
+
+  pairs_hash[9][7] = pairs_hash[9][10] = pairs_hash[9][11] = std_opt
+
+  pairs_hash[10] = Hash.new(std_opt)
 
   return pairs_hash
 end
 
-hard_options = build_hard_options_hash
-soft_optionsj = build_soft_options_hash
-
+# Gather user input
 puts "Enter your first card: "
 first_card = gets.chomp
 puts "Enter your second card: "
@@ -133,21 +131,20 @@ if first_card == "" || second_card == ""|| dealer_top == ""
   puts "You didn't follow instructions. Bye."
 else
   correct_options = {}
-
-puts
+  choices_for_total = {}
 
   if first_card == second_card
     correct_options = build_pair_options
+    choices_for_total = correct_options[convert_card_value(second_card)]
   elsif first_card == "A" || second_card == "A"
-    correct_options = build_soft_options_hash
+    correct_options = build_soft_options
+    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
   else
-    correct_options = build_hard_options_hash
+    correct_options = build_hard_options
+    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
   end
 
-  puts "tot_val = #{convert_card_value(first_card)+convert_card_value(second_card)}"
-  choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
-  puts choices_for_total
-
   your_ideal_option = choices_for_total[convert_card_value(dealer_top)]
-  puts your_ideal_option
+
+  puts "You should #{your_ideal_option}."
 end

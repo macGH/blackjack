@@ -1,0 +1,200 @@
+def convert_card_value (input)
+  if input == "A"
+    return 11
+  elsif input == "J" || input =="Q" || input == "K"
+    return 10
+  elsif input.to_i.to_s == input
+    num = input.to_i
+    if (1..10).to_a.include?(num)
+      return num
+    else
+      return 0 #invalid input
+    end
+  else
+      return 0  #invalid input
+  end
+end
+
+def build_hard_options (num_decks)
+  hit_opt = "Hit"
+  dh_opt = "Double Hit, if possible; otherwise Hit"
+  std_opt = "Stand"
+
+  hard_hash = {}
+
+  (5..16).each do |hand_tot|
+    hard_hash[hand_tot] = Hash.new(hit_opt)
+  end
+
+  (17..21).each do |hand_tot|
+    hard_hash[hand_tot] = Hash.new(std_opt)
+  end
+
+  #now update exceptions
+  if num_decks == "1"
+    hard_hash[8][5] = dh_opt
+    hard_hash[8][6] = dh_opt
+  end
+  (2..6).each do |x|
+    hard_hash[9][x] = dh_opt
+  end
+  hard_hash[10] = Hash.new (dh_opt)
+  hard_hash[10][10] = hit_opt
+  hard_hash[10][11] = hit_opt
+  hard_hash[11] = Hash.new (dh_opt)
+  (4..6).each do |x|
+    hard_hash[12][x] = std_opt
+  end
+  (13..16).each do |x|
+    (2..6).each do |y|
+      hard_hash[x][y] = std_opt
+    end
+  end
+
+  return hard_hash
+end
+
+def build_soft_options (num_decks)
+  hit_opt = "Hit"
+  dh_opt = "Double Hit, if possible; otherwise Hit"
+  ds_opt = "Double Hit, if possible; otherwise Stand"
+  std_opt = "Stand"
+
+  soft_hash = {}
+
+  (13..17).each do |x|
+    soft_hash[x] = Hash.new(hit_opt)
+  end
+
+  (18..21).each do |x|
+    soft_hash[x] = Hash.new(std_opt)
+  end
+
+  #now set exceptions
+
+  (13..17).each do |x|
+    (4..6).each do |y|
+      soft_hash[x][y] = dh_opt
+    end
+  end
+
+  if num_decks == "2"
+    soft_hash[13][4] = soft_hash[14][4] = hit_opt
+    soft_hash[17][2] = dh_opt
+  end
+
+  soft_hash[17][2] = soft_hash[17][3] = dh_opt
+  soft_hash[18][3] = ds_opt
+  soft_hash[18][3] = soft_hash[18][4] = soft_hash[18][5] = soft_hash[18][6] = ds_opt
+  soft_hash[18][9] = soft_hash[18][10] = hit_opt
+  if num_decks == "1"
+    soft_hash[19][6] = ds_opt
+  end
+  return soft_hash
+end
+
+def build_pair_options (num_decks)
+  hit_opt = "Hit"
+  dh_opt = "Double Hit, if possible; otherwise Hit"
+  std_opt = "Stand"
+  spl_opt = "Split"
+
+  pairs_hash = {}
+
+  (2..13).each do |card|
+    pairs_hash[card] = Hash.new(spl_opt)
+  end
+
+  #now set exceptions
+  (2..4).each do |x|
+    (9..11).each do |y|
+      pairs_hash[x][y] = hit_opt
+    end
+  end
+
+  if (num_decks == "2")
+    pairs_hash[3][8] = hit_opt
+    pairs_hash[4][4] = hit_opt
+    pairs_hash[7][10] = std_opt
+  end
+  pairs_hash[2][8] = hit_opt
+  pairs_hash[4][2] = pairs_hash[4][3] = pairs_hash[4][7] = pairs_hash[4][8] = hit_opt
+
+  (2..9).each do |x|
+    pairs_hash[5][x] = dh_opt
+  end
+
+  pairs_hash[5][10] = pairs_hash[5][11] = hit_opt
+
+  (8..11).each do |x|
+    pairs_hash[6][x] = hit_opt
+  end
+
+  pairs_hash[7][9] = pairs_hash[7][11] = hit_opt
+  pairs_hash[7][10] = std_opt
+
+  pairs_hash[9][7] = pairs_hash[9][10] = pairs_hash[9][11] = std_opt
+
+  pairs_hash[10] = Hash.new(std_opt)
+
+  return pairs_hash
+end
+
+num_deck_choices = ["1", "2", "4+"]
+# Gather user input
+puts "Enter your first card: "
+first_card = gets.chomp
+puts "Enter your second card: "
+second_card = gets.chomp
+puts "Enter the dealer top hand: "
+dealer_top = gets.chomp
+puts "Enter the number of decks, either 1, 2 or 4+: "
+deck_count = gets.chomp
+
+if first_card == "" || second_card == ""|| dealer_top == ""
+  puts "Oops! You skipped some cards. Bye."
+elsif convert_card_value(first_card) == 0 || convert_card_value(second_card) == 0|| convert_card_value(dealer_top) == 0
+  puts "Not sure what kind of deck you have, but we don't have it"
+elsif !num_deck_choices.include?(deck_count)
+  puts "Oops, the number of deck choices are #{num_deck_choices}"
+else
+  correct_options = {}
+  choices_for_total = {}
+
+  if first_card == second_card
+    correct_options = build_pair_options(deck_count)
+    choices_for_total = correct_options[convert_card_value(second_card)]
+  elsif first_card == "A" || second_card == "A"
+    correct_options = build_soft_options(deck_count)
+    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+  else
+    correct_options = build_hard_options(deck_count)
+    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+  end
+
+  your_ideal_option = choices_for_total[convert_card_value(dealer_top)]
+
+  puts "You should #{your_ideal_option}."
+
+
+  if your_ideal_option.count("Hit") > 0
+    running_total = convert_card_value(first_card) + convert_card_value(second_card)
+    loop do
+      puts "What card did you receive? "
+      next_card = gets.chomp
+      running_total += convert_card_value(next_card)
+      if running_total < 21
+        choices_for_total = correct_options[running_total]
+        your_ideal_option = choices_for_total[convert_card_value(dealer_top)]
+        puts "Your new total is: #{running_total}"
+
+      elsif running_total > 21
+        puts "It's a bust!!"
+        break
+      else
+        puts "Blackjack!!"
+        break
+      end
+    end
+  end
+end

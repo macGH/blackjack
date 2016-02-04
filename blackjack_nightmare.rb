@@ -5,7 +5,7 @@ def convert_card_value (input)
     return 10
   elsif input.to_i.to_s == input
     num = input.to_i
-    if (1..10).to_a.include?(num)
+    if (2..10).to_a.include?(num)
       return num
     else
       return 0 #invalid input
@@ -140,7 +140,7 @@ def build_pair_options (num_decks)
   return pairs_hash
 end
 
-num_deck_choices = ["1", "2", "4+"]
+num_deck_choices = ["1", "2"]
 # Gather user input
 puts "Enter your first card: "
 first_card = gets.chomp
@@ -148,7 +148,7 @@ puts "Enter your second card: "
 second_card = gets.chomp
 puts "Enter the dealer top hand: "
 dealer_top = gets.chomp
-puts "Enter the number of decks, either 1, 2 or 4+: "
+puts "Enter the number of decks, either 1 or 2 "
 deck_count = gets.chomp
 
 if first_card == "" || second_card == "" || dealer_top == ""
@@ -160,41 +160,41 @@ elsif !num_deck_choices.include?(deck_count)
 else
   correct_options = {}
   choices_for_total = {}
+  running_total = convert_card_value(first_card) + convert_card_value(second_card)
 
   if first_card == second_card
     correct_options = build_pair_options(deck_count)
     choices_for_total = correct_options[convert_card_value(second_card)]
   elsif first_card == "A" || second_card == "A"
     correct_options = build_soft_options(deck_count)
-    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+    choices_for_total = correct_options[running_total]
   else
     correct_options = build_hard_options(deck_count)
-    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+    choices_for_total = correct_options[running_total]
   end
 
   your_ideal_option = choices_for_total[convert_card_value(dealer_top)]
 
-  puts "You should #{your_ideal_option}."
+  puts ">> You should #{your_ideal_option}."
+  puts ">> In fact... Blackjack! You win!!" if running_total == 21
 
-
-  if your_ideal_option.count("Hit") > 0
-    running_total = convert_card_value(first_card) + convert_card_value(second_card)
     loop do
-      puts "What card did you receive? "
+      break if !your_ideal_option.downcase.include?("hit")
+
+      puts ">> What card did you receive? "
       next_card = gets.chomp
       running_total += convert_card_value(next_card)
       if running_total < 21
         choices_for_total = correct_options[running_total]
         your_ideal_option = choices_for_total[convert_card_value(dealer_top)]
-        puts "Your new total is: #{running_total}"
+        puts ">> Your new total is: #{running_total}. You should #{your_ideal_option}"
 
       elsif running_total > 21
-        puts "It's a bust!!"
+        puts ">> It's a bust!!"
         break
       else
-        puts "Blackjack!!"
+        puts ">> Blackjack!!"
         break
-      end
-    end
-  end
-end
+      end #end if running_total checks
+  end #end loop
+end #end check for valid input

@@ -5,7 +5,7 @@ def convert_card_value (input)
     return 10
   elsif input.to_i.to_s == input
     num = input.to_i
-    if (1..10).to_a.include?(num)
+    if (2..10).to_a.include?(num)
       return num
     else
       return 0 #invalid input

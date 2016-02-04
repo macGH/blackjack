@@ -5,7 +5,7 @@ def convert_card_value (input)
     return 10
   elsif input.to_i.to_s == input
     num = input.to_i
-    if (1..10).to_a.include?(num)
+    if (2..10).to_a.include?(num)
       return num
     else
       return 0 #invalid input
@@ -148,7 +148,7 @@ puts "Enter your second card: "
 second_card = gets.chomp
 puts "Enter the dealer top hand: "
 dealer_top = gets.chomp
-puts "Enter the number of decks, either 1, 2: "
+puts "Enter the number of decks, either 1 or 2: "
 deck_count = gets.chomp
 
 if first_card == "" || second_card == ""|| dealer_top == ""

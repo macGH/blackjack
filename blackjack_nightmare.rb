@@ -1,7 +1,7 @@
 def convert_card_value (input)
-  if input == "A"
+  if input.upcase == "A"
     return 11
-  elsif input == "J" || input =="Q" || input == "K"
+  elsif input.upcase == "J" || input.upcase =="Q" || input.upcase == "K"
     return 10
   elsif input.to_i.to_s == input
     num = input.to_i
@@ -151,7 +151,7 @@ dealer_top = gets.chomp
 puts "Enter the number of decks, either 1, 2 or 4+: "
 deck_count = gets.chomp
 
-if first_card == "" || second_card == ""|| dealer_top == ""
+if first_card == "" || second_card == "" || dealer_top == ""
   puts "Oops! You skipped some cards. Bye."
 elsif convert_card_value(first_card) == 0 || convert_card_value(second_card) == 0|| convert_card_value(dealer_top) == 0
   puts "Not sure what kind of deck you have, but we don't have it"

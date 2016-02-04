@@ -1,7 +1,7 @@
 def convert_card_value (input)
-  if input == "A"
+  if input.upcase == "A"
     return 11
-  elsif input == "J" || input =="Q" || input == "K"
+  elsif input.upcase == "J" || input.upcase =="Q" || input.upcase == "K"
     return 10
   elsif input.to_i.to_s == input
     num = input.to_i
@@ -140,7 +140,7 @@ def build_pair_options (num_decks)
   return pairs_hash
 end
 
-num_deck_choices = ["1", "2", "4+"]
+num_deck_choices = ["1", "2"]
 # Gather user input
 puts "Enter your first card: "
 first_card = gets.chomp
@@ -148,7 +148,7 @@ puts "Enter your second card: "
 second_card = gets.chomp
 puts "Enter the dealer top hand: "
 dealer_top = gets.chomp
-puts "Enter the number of decks, either 1, 2 or 4+: "
+puts "Enter the number of decks, either 1, 2: "
 deck_count = gets.chomp
 
 if first_card == "" || second_card == ""|| dealer_top == ""
@@ -160,19 +160,21 @@ elsif !num_deck_choices.include?(deck_count)
 else
   correct_options = {}
   choices_for_total = {}
+  running_total = convert_card_value(first_card) + convert_card_value(second_card)
 
   if first_card == second_card
     correct_options = build_pair_options(deck_count)
     choices_for_total = correct_options[convert_card_value(second_card)]
   elsif first_card == "A" || second_card == "A"
     correct_options = build_soft_options(deck_count)
-    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+    choices_for_total = correct_options[running_total]
   else
     correct_options = build_hard_options(deck_count)
-    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+    choices_for_total = correct_options[running_total]
   end
 
   your_ideal_option = choices_for_total[convert_card_value(dealer_top)]
 
   puts "You should #{your_ideal_option}."
+  puts "In fact... Blackjack!! You win!" if running_total == 21
 end

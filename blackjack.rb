@@ -1,7 +1,7 @@
 def convert_card_value (input)
-  if input == "A"
+  if input.upcase == "A"
     return 11
-  elsif input == "J" || input =="Q" || input == "K"
+  elsif input.upcase == "J" || input.upcase =="Q" || input.upcase == "K"
     return 10
   elsif input.to_i.to_s == input
     num = input.to_i
@@ -141,19 +141,21 @@ elsif convert_card_value(first_card) == 0 || convert_card_value(second_card) == 
 else
   correct_options = {}
   choices_for_total = {}
+  running_total = convert_card_value(first_card) + convert_card_value(second_card)
 
   if first_card == second_card
     correct_options = build_pair_options
     choices_for_total = correct_options[convert_card_value(second_card)]
   elsif first_card == "A" || second_card == "A"
     correct_options = build_soft_options
-    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+    choices_for_total = correct_options[running_total]
   else
     correct_options = build_hard_options
-    choices_for_total = correct_options[convert_card_value(first_card) + convert_card_value(second_card)]
+    choices_for_total = correct_options[running_total]
   end
 
   your_ideal_option = choices_for_total[convert_card_value(dealer_top)]
 
   puts "You should #{your_ideal_option}."
+  puts "In fact... Blackjack! You win!!" if running_total == 21
 end

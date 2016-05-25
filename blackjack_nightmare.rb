@@ -7,12 +7,10 @@ def convert_card_value (input)
     num = input.to_i
     if (2..10).to_a.include?(num)
       return num
-    else
-      return 0 #invalid input
     end
-  else
-      return 0  #invalid input
   end
+
+  return 0  #invalid card
 end
 
 def build_hard_options (num_decks)
